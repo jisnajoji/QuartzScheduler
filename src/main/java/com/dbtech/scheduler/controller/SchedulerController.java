@@ -2,14 +2,19 @@ package com.dbtech.scheduler.controller;
 
 import com.dbtech.scheduler.entity.Job;
 import com.dbtech.scheduler.services.SchedulerService;
+import java.util.List;
+
+import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
+/**
+ * Scheduler controller.
+ */
 @RestController
 public class SchedulerController {
 
@@ -18,37 +23,58 @@ public class SchedulerController {
     @Autowired
     SchedulerService schedulerService;
 
-    @GetMapping("/hello")
-    public String sayHello(){
-        return "Ola Amigos!";
-    }
-    
-    @PostMapping("/ola")
-    public String sayHelloWithName(@RequestBody Job job){
-        return "Ola " + job.getJobName();
-    }
-    
-    @PostMapping("/scheduleGet")
-    public void scheduleGetJob(@RequestBody Job job){
+    @PostMapping("/schedule")
+    public void scheduleJob(@RequestBody Job job){
         if(null!=job){
-            schedulerService.scheduleGetJob(job);
-        }
-    }
-
-    @PostMapping("/schedulePost")
-    public void schedulePostJob(@RequestBody Job job){
-        if(null!=job){
-            schedulerService.schedulePostJob(job);
+            schedulerService.scheduleJob(job);
         }
     }
     
     @GetMapping("/scheduledJobs")
-    public Map<String, Job> getScheduledJobs(){
+    public List<Job> getScheduledJobs() {
         return schedulerService.getScheduledJobs();
     }
+
+    @PutMapping("/updateJob/{id}")
+    public ResponseEntity<String> updateScheduledJob(@PathVariable Long id, @RequestBody Job job) {
+        try {
+            schedulerService.updateScheduledJob(id, job);
+            return ResponseEntity.ok("Job with ID" + id + "has been updated.");
+        } catch (BadRequestException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid request body");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error in updating job with ID" + id);
+        }
+    }
     
-    @DeleteMapping("/deleteJob/{jobId}")
-    public void deleteScheduledJob(@PathVariable String jobId){
-        schedulerService.deleteScheduledJob(jobId);
+    @DeleteMapping("/deleteJob/{id}")
+    public void deleteScheduledJob(@PathVariable Long id){
+        schedulerService.deleteScheduledJob(id);
+    }
+
+    @PostMapping("/restart/{id}")
+    public ResponseEntity<String> restartJob(@PathVariable Long id) {
+        try {
+            schedulerService.restartJob(id);
+            return ResponseEntity.ok("Job with ID " + id + " has been restarted.");
+        } catch (Exception e) {
+            log.error("Error restarting job with ID: " + id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error restarting job with ID " + id + ": " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/stop/{id}")
+    public ResponseEntity<String> stopJob(@PathVariable Long id) {
+        try {
+            schedulerService.stopJob(id);
+            return ResponseEntity.ok("Job with ID " + id + " has been stopped.");
+        } catch (Exception e) {
+            log.error("Error stopping job with ID: " + id, e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error stopping job with ID " + id + ": " + e.getMessage());
+        }
     }
 }
