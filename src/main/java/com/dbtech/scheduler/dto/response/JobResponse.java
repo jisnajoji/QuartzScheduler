@@ -1,18 +1,16 @@
-package com.dbtech.scheduler.entity;
+package com.dbtech.scheduler.dto.response;
 
-import jakarta.persistence.*;
 import lombok.*;
 
-@Data
+/**
+ * Job response.
+ */
+@Builder
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@ToString
-@Entity
-@Table(name = "scheduler_job")
-public class Job {
-
-    @Id
-    @GeneratedValue(strategy= GenerationType.IDENTITY)
+public class JobResponse {
     private Long id;
     private String jobId;
     private String jobName;

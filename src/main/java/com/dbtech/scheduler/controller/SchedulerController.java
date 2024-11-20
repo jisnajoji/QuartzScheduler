@@ -1,7 +1,9 @@
 package com.dbtech.scheduler.controller;
 
+import com.dbtech.scheduler.dto.request.JobRequest;
 import com.dbtech.scheduler.entity.Job;
 import com.dbtech.scheduler.services.SchedulerService;
+import com.dbtech.scheduler.services.SchedulerServiceImpl;
 import java.util.List;
 
 import org.apache.coyote.BadRequestException;
@@ -24,7 +26,7 @@ public class SchedulerController {
     SchedulerService schedulerService;
 
     @PostMapping("/schedule")
-    public void scheduleJob(@RequestBody Job job){
+    public void scheduleJob(@RequestBody JobRequest job){
         if(null!=job){
             schedulerService.scheduleJob(job);
         }
@@ -36,9 +38,9 @@ public class SchedulerController {
     }
 
     @PutMapping("/updateJob/{id}")
-    public ResponseEntity<String> updateScheduledJob(@PathVariable Long id, @RequestBody Job job) {
+    public ResponseEntity<String> updateScheduledJob(@PathVariable Long id, @RequestBody JobRequest jobRequest) {
         try {
-            schedulerService.updateScheduledJob(id, job);
+            schedulerService.updateScheduledJob(id, jobRequest);
             return ResponseEntity.ok("Job with ID" + id + "has been updated.");
         } catch (BadRequestException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
