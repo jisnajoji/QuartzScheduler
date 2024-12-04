@@ -37,6 +37,11 @@
       <option name="url" value="https://hcm-cicd.hpeswlab.net/nexus/repository/maven-internal/" />
     </remote-repository>
     <remote-repository>
+      <option name="id" value="central" />
+      <option name="name" value="central" />
+      <option name="url" value="https://repo.maven.apache.org/maven2" />
+    </remote-repository>
+    <remote-repository>
       <option name="id" value="content-nexus" />
       <option name="name" value="Content central" />
       <option name="url" value="http://mydph0022.hpeswlab.net:8081/nexus/content/groups/public/" />

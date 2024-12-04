@@ -2,6 +2,7 @@ package com.dbtech.scheduler;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 
 /**
  * Expose an API which will take the API of your choice and can schedule the job,
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * This project can be directly used inside your microservices' framework.
  */
 @SpringBootApplication
+@EnableJpaAuditing
 public class SchedulerApplication {
 
     public static void main(String[] args) {

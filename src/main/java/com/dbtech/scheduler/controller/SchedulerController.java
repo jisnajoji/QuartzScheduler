@@ -1,23 +1,19 @@
 package com.dbtech.scheduler.controller;
 
 import com.dbtech.scheduler.dto.request.JobRequest;
-import com.dbtech.scheduler.entity.Job;
-import com.dbtech.scheduler.services.SchedulerService;
-import com.dbtech.scheduler.services.SchedulerServiceImpl;
+import com.dbtech.scheduler.dto.response.JobDetailDto;
+import com.dbtech.scheduler.services.scheduler.SchedulerService;
 import java.util.List;
-
-import org.apache.coyote.BadRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * Scheduler controller.
  */
 @RestController
+@RequestMapping(value = "/jobs")
 public class SchedulerController {
 
     private static final Logger log = LoggerFactory.getLogger(SchedulerController.class);
@@ -26,57 +22,34 @@ public class SchedulerController {
     SchedulerService schedulerService;
 
     @PostMapping("/schedule")
-    public void scheduleJob(@RequestBody JobRequest job){
-        if(null!=job){
-            schedulerService.scheduleJob(job);
-        }
-    }
-    
-    @GetMapping("/scheduledJobs")
-    public List<Job> getScheduledJobs() {
-        return schedulerService.getScheduledJobs();
+    public String scheduleJob(@RequestBody JobRequest jobRequest) {
+        return schedulerService.scheduleJob(jobRequest);
     }
 
-    @PutMapping("/updateJob/{id}")
-    public ResponseEntity<String> updateScheduledJob(@PathVariable Long id, @RequestBody JobRequest jobRequest) {
-        try {
-            schedulerService.updateScheduledJob(id, jobRequest);
-            return ResponseEntity.ok("Job with ID" + id + "has been updated.");
-        } catch (BadRequestException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Invalid request body");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error in updating job with ID" + id);
-        }
-    }
-    
-    @DeleteMapping("/deleteJob/{id}")
-    public void deleteScheduledJob(@PathVariable Long id){
-        schedulerService.deleteScheduledJob(id);
+    @GetMapping("/list")
+    public List<JobDetailDto> listJobs() {
+        return schedulerService.listJobs();
     }
 
-    @PostMapping("/restart/{id}")
-    public ResponseEntity<String> restartJob(@PathVariable Long id) {
-        try {
-            schedulerService.restartJob(id);
-            return ResponseEntity.ok("Job with ID " + id + " has been restarted.");
-        } catch (Exception e) {
-            log.error("Error restarting job with ID: " + id, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error restarting job with ID " + id + ": " + e.getMessage());
-        }
+
+    @DeleteMapping("/delete/{jobName}/{jobGroup}")
+    public String deleteJob(@PathVariable String jobName, @PathVariable String jobGroup) {
+        return schedulerService.deletejob(jobName, jobGroup);
     }
 
-    @PostMapping("/stop/{id}")
-    public ResponseEntity<String> stopJob(@PathVariable Long id) {
-        try {
-            schedulerService.stopJob(id);
-            return ResponseEntity.ok("Job with ID " + id + " has been stopped.");
-        } catch (Exception e) {
-            log.error("Error stopping job with ID: " + id, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error stopping job with ID " + id + ": " + e.getMessage());
-        }
+    @PostMapping("/pause/{jobName}/{jobGroup}")
+    public String pauseJob(@PathVariable String jobName, @PathVariable String jobGroup) {
+        return schedulerService.pauseJob(jobName, jobGroup);
     }
+
+    @PostMapping("/restart/{jobName}/{jobGroup}")
+    public String restartJob(@PathVariable String jobName, @PathVariable String jobGroup) {
+        return schedulerService.restartJob(jobName, jobGroup);
+    }
+
+    @PutMapping("/update/{jobName}")
+    public String updateJob(@PathVariable String jobName, @RequestBody JobRequest jobRequest) {
+        return schedulerService.updateJob(jobName, jobRequest);
+    }
+
 }
